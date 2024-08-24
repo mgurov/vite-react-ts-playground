@@ -3,11 +3,15 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import './App.css'
 
-const pages = import.meta.glob("./pages/**/*.jsx", { eager: true });
+//TODO: non-eager and all with selector later?
+const pages = import.meta.glob("./pages/**/*.tsx", { eager: true });
+
+console.log('pages', pages);
+console.log('Object.keys(pages)', Object.keys(pages));
 
 const routes = [];
 for (const path of Object.keys(pages)) {
-  const fileName = path.match(/\.\/pages\/(.*)\.jsx$/)?.[1];
+  const fileName = path.match(/\.\/pages\/(.*)\.tsx$/)?.[1];
   if (!fileName) {
     continue;
   }
@@ -39,6 +43,7 @@ function App() {
   return (
     <>
       <h1>Vite + React</h1>
+      <RouterProvider router={router} />
       <div className="card">
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
@@ -47,9 +52,6 @@ function App() {
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
       </div>
-      <p>
-        <RouterProvider router={router} />
-      </p>
     </>
   )
 }
