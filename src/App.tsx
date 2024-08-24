@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouteObject, RouterProvider } from "react-router-dom";
 
 import './App.css'
 
@@ -9,13 +9,14 @@ const pages = import.meta.glob("./pages/**/*.tsx", { eager: true });
 console.log('pages', pages);
 console.log('Object.keys(pages)', Object.keys(pages));
 
-const routes = [];
+const routes: RouteObject[] = [];
 for (const path of Object.keys(pages)) {
   const fileName = path.match(/\.\/pages\/(.*)\.tsx$/)?.[1];
   if (!fileName) {
     continue;
   }
 
+  //TODO: param example
   const normalizedPathName = fileName.includes("$")
     ? fileName.replace("$", ":")
     : fileName.replace(/\/index/, "");
