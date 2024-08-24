@@ -12,7 +12,7 @@ test('sub index', async ({ page }) => {
   await expect(page.getByTestId('routed')).toHaveText('sub');
 });
 
-test('sub index', async ({ page }) => {
+test('sub nice', async ({ page }) => {
   await page.goto('/sub/nice');
 
   await expect(page.getByTestId('routed')).toHaveText('nice');
