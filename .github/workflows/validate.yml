@@ -1,7 +1,8 @@
 name: lint and test
 on:
   push:
-    branches: [ main, master ]
+    branches: 
+      - '**'
   pull_request:
     branches: [ main, master ]
 jobs:
@@ -17,8 +18,6 @@ jobs:
       run: npm ci
     - name: Validate the build statically
       run: npm run validate
-    # - name: Install Playwright Browsers
-    #   run: npx playwright install --with-deps
     - name: Install Chromium
       run: npx playwright install chromium
     - name: Run Playwright tests
