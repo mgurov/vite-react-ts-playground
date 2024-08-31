@@ -53,7 +53,7 @@ function pathsToRoutes(): RouteObject[] {
     return routes;
 }
 
-export function createRouter(props: {layout?: ReactNode}) {
+export function createRouter(props?: {layout?: ReactNode}) {
     const pageRoutes = pathsToRoutes()
     const routes: RouteObject[] = props?.layout ? [{
         path: "/",
