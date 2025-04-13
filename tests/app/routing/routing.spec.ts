@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures/ourTest';
 
 test('root route', async ({ page }) => {
   await page.goto('/');
@@ -20,13 +20,27 @@ test('sub nice', async ({ page }) => {
 
 test('parameterized calls with loading', async ({ page }) => {
 
-  await page.route('https://swapi.dev/api/people/${id}/', route => {
-    route.fulfill({json: {name: 'Luke Skywalker', id: '1'}});
+  //consoleLogging.ignoreErrorMessagesContaining("No `HydrateFallback` element provided to render during initial hydration")
+
+  let unpause: () => void;
+  const responsePromise = new Promise<void>(resolve => {
+    unpause = resolve;
+  });
+
+  await page.route(`https://swapi.dev/api/people/${1}/`, async route => {
+    await responsePromise;
+    return route.fulfill({json: {name: 'Proxied Luke Skywalker', id: '1'}});
   });
 
   await page.goto('/routing-demo/swapi/people/1');
 
-  await expect(page.getByTestId('routed')).toHaveText('Luke Skywalker');
+  await expect(page.getByTestId('routed')).not.toBeAttached();
+
+  await expect(page.getByTestId('hydrate-fallback-loading')).toContainText('Loading...');
+
+  unpause!();
+
+  await expect(page.getByTestId('routed')).toHaveText('Proxied Luke Skywalker');
 });
 
 test('entity path', async ({ page }) => {

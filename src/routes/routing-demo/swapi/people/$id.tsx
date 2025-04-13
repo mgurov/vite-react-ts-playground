@@ -9,3 +9,7 @@ export default function SwPeople() {
 export async function loader({params}: {params: {id: string}}) {
     return fetch(`https://swapi.dev/api/people/${params.id}/`)
 }
+
+export function HydrateFallbackElement() {
+    return <div data-testid="hydrate-fallback-loading">Loading...</div>
+}

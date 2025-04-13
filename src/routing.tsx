@@ -34,6 +34,7 @@ function pathsToRoutes(): RouteObject[] {
             loader?: LoaderFunction,
             action?: ActionFunction,
             ErrorBoundary?: React.FunctionComponent,
+            HydrateFallbackElement?: () => React.ReactNode,
         }
 
         if (!page.default) {
@@ -47,6 +48,7 @@ function pathsToRoutes(): RouteObject[] {
             Component: page.default,
             loader: page.loader,
             action: page.action,
+            hydrateFallbackElement: page.HydrateFallbackElement?.(),
             ...( ErrorBoundary && {errorElement: <ErrorBoundary/>} )
         });
     }
@@ -60,5 +62,14 @@ export function createRouter(props?: {layout?: ReactNode}) {
         element: props.layout,
         children: pageRoutes
     }] : pageRoutes
-    return createBrowserRouter(routes);
+    return createBrowserRouter(routes, {
+        future: {
+            v7_fetcherPersist: true,
+            v7_relativeSplatPath: true,
+            v7_normalizeFormMethod: true,
+            v7_partialHydration: true,
+            v7_skipActionErrorRevalidation: true,
+            //v7_startTransition: true,
+        },
+    });
 }
