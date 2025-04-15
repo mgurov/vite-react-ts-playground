@@ -20,8 +20,6 @@ test('sub nice', async ({ page }) => {
 
 test('parameterized calls with loading', async ({ page }) => {
 
-  //consoleLogging.ignoreErrorMessagesContaining("No `HydrateFallback` element provided to render during initial hydration")
-
   let unpause: () => void;
   const responsePromise = new Promise<void>(resolve => {
     unpause = resolve;
@@ -63,4 +61,31 @@ test('flat path support', async ({ page }) => {
 
   await expect(page.getByTestId('routed')).toHaveText('Entity 4 Subentity 42');
 });
+
+test.describe('error boundarying', () => {
+
+  test('error thrown', async ({ page, consoleLogging }) => {
+
+    consoleLogging.ignoreErrorMessagesContaining('The above error occurred in the <Page> component')
+    consoleLogging.ignoreErrorMessagesContaining('React Router caught the following error during render')
+
+    await page.goto('/routing-demo/error-bounded/throw');  
+  
+    await expect(page.getByTestId('routed')).not.toBeAttached();
+    
+    // global layout should be rendered
+    await expect(page.getByTestId('global-title')).toBeAttached();
+
+    await expect(page.getByTestId('error-caught-message')).toHaveText('Was instructed to throw');
+  });
+
+  test('error not thrown', async ({ page }) => {
+    await page.goto('/routing-demo/error-bounded/ok');
+
+    await expect(page.getByTestId('routed')).toHaveText('ok');
+  });
+  
+
+});
+
 

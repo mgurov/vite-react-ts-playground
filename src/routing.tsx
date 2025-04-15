@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { ActionFunction, createBrowserRouter, LoaderFunction, RouteObject } from "react-router-dom";
+import { createBrowserRouter, LoaderFunction, RouteObject } from "react-router-dom";
 
 /**
  * A simplistic file-based router inspired by https://dev.to/franciscomendes10866/file-based-routing-using-vite-and-react-router-3fdo 
@@ -32,7 +32,6 @@ function pathsToRoutes(): RouteObject[] {
         const page = pages[path] as {
             default: React.FunctionComponent,
             loader?: LoaderFunction,
-            action?: ActionFunction,
             ErrorBoundary?: React.FunctionComponent,
             HydrateFallbackElement?: () => React.ReactNode,
         }
@@ -47,7 +46,6 @@ function pathsToRoutes(): RouteObject[] {
             path: fileName === "index" ? "/" : `/${normalizedPathName}`,
             Component: page.default,
             loader: page.loader,
-            action: page.action,
             hydrateFallbackElement: page.HydrateFallbackElement?.(),
             ...( ErrorBoundary && {errorElement: <ErrorBoundary/>} )
         });

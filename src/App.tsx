@@ -11,7 +11,7 @@ function App() {
 
   return (
     <>
-      <h1>Vite + React</h1>
+      <h1 data-testid="global-title">Vite + React</h1>
       <RouterProvider router={router} />
       <div className="card">
         <button onClick={() => setCount((count) => count + 1)}>
