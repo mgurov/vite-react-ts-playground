@@ -12,6 +12,12 @@ test('sub index', async ({ page }) => {
   await expect(page.getByTestId('routed')).toHaveText('sub');
 });
 
+test('layout attached everywhere', async ({ page }) => {
+  await page.goto('/routing-demo/nice');
+
+  await expect(page.getByTestId('global-title')).toHaveText('Vite + React');
+});
+
 test('sub nice', async ({ page }) => {
   await page.goto('/routing-demo/nice');
 
