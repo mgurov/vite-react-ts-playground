@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "validate": "npm run lint && npx tsc -b",
+    "test:unit": "vitest run --coverage",
     "validate:full": "npm run validate && npx playwright test",
     "preview": "vite preview"
   },

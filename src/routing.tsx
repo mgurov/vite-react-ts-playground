@@ -5,63 +5,68 @@ import { createBrowserRouter, LoaderFunction, RouteObject } from "react-router-d
  * A simplistic file-based router inspired by https://dev.to/franciscomendes10866/file-based-routing-using-vite-and-react-router-3fdo 
  */
 
-const pages = import.meta.glob("./routes/**/*.tsx", { eager: true });
-const pageRegex = /\.\/routes\/(.*)\.tsx$/;
+export function normalizePathName(fileName: string): string {
+    const deflat = fileName.split('/').flatMap(pathPart => pathPart.split('.'));
+    return deflat.flatMap((pathParticle) => {
+        if (pathParticle === "index") return [];
+        if (pathParticle.startsWith('$')) return [pathParticle.replace("$", ":")];
+        return [pathParticle];
+    }).join('/');
+}
 
-function pathsToRoutes(): RouteObject[] {
+export function getPageRouteObject(
+    fileName: string,
+    page: Page
+): RouteObject {
+    const normalizedPathName = normalizePathName(fileName);
+    const ErrorBoundary = page.ErrorBoundary;
+    return {
+        path: fileName === "index" ? "/" : `/${normalizedPathName}`,
+        Component: page.default,
+        loader: page.loader,
+        hydrateFallbackElement: page.HydrateFallbackElement?.(),
+        ...( ErrorBoundary && {errorElement: <ErrorBoundary/>} )
+    };
+}
+
+type Page = {
+    default: React.FunctionComponent,
+    loader?: LoaderFunction,
+    ErrorBoundary?: React.FunctionComponent,
+    HydrateFallbackElement?: () => React.ReactNode,
+}
+
+export function pathsToRoutes(
+    pages: Record<string, Page>,
+    pageRegex: RegExp = defaultPageRegex
+): RouteObject[] {
     const routes: RouteObject[] = [];
     for (const path of Object.keys(pages)) {
         const fileName = path.match(pageRegex)?.[1];
         if (!fileName) {
-            console.error(`unexpected non-match of ${path} to ${pageRegex}`);
+            // For testability, don't throw or log here
             continue;
         }
-
-        const deflat = fileName.split('/').flatMap(pathPart => pathPart.split('.'))
-
-        const normalizedPathName = deflat.flatMap((pathParticle) => {
-            if (pathParticle === "index") {
-                return []
-            }
-            if (pathParticle.startsWith('$')) {
-                return [pathParticle.replace("$", ":")]
-            }
-            return [pathParticle]
-        }).join('/')
-
-        const page = pages[path] as {
-            default: React.FunctionComponent,
-            loader?: LoaderFunction,
-            ErrorBoundary?: React.FunctionComponent,
-            HydrateFallbackElement?: () => React.ReactNode,
-        }
-
+        const page = pages[path];
         if (!page.default) {
-            throw Error(`Page on path ${path} doesn't have required default export`)
+            throw Error(`Page on path ${path} doesn't have required default export`);
         }
-
-        const ErrorBoundary = page.ErrorBoundary;
-
-        routes.push({
-            path: fileName === "index" ? "/" : `/${normalizedPathName}`,
-            Component: page.default,
-            loader: page.loader,
-            hydrateFallbackElement: page.HydrateFallbackElement?.(),
-            ...( ErrorBoundary && {errorElement: <ErrorBoundary/>} )
-        });
+        routes.push(getPageRouteObject(fileName, page));
     }
     return routes;
 }
 
+const pages = import.meta.glob("./routes/**/*.tsx", { eager: true }) as Record<string, Page>;
+export const defaultPageRegex = /\.\/routes\/(.*)\.tsx$/;
+
 export function createRouter(props?: {layout?: ReactNode}) {
-    const pageRoutes = pathsToRoutes()
+    const pageRoutes = pathsToRoutes(pages, defaultPageRegex);
     const routes: RouteObject[] = props?.layout ? [{
         path: "/",
         element: props.layout,
         children: pageRoutes
-    }] : pageRoutes
+    }] : pageRoutes;
     return createBrowserRouter(routes, {
-        future: {
-        },
+        future: {},
     });
 }
