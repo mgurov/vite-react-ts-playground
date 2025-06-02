@@ -29,7 +29,7 @@ export function getPageRouteObject(
     };
 }
 
-type Page = {
+export type Page = {
     default: React.FunctionComponent,
     loader?: LoaderFunction,
     ErrorBoundary?: React.FunctionComponent,

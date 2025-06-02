@@ -1,5 +1,5 @@
 import { expect, test, describe } from 'vitest'
-import { normalizePathName, getPageRouteObject, pathsToRoutes } from './routing.js'
+import { normalizePathName, getPageRouteObject, pathsToRoutes, Page } from './routing.js'
 
 describe('normalizePathName', () => {
   test('removes index', () => {
@@ -17,14 +17,14 @@ describe('normalizePathName', () => {
 
 test('getPageRouteObject returns correct route object', () => {
   const page = { default: () => null }
-  const route = getPageRouteObject('./routes/foo.tsx', 'foo', page)
+  const route = getPageRouteObject('foo', page)
   expect(route.path).toBe('/foo')
   expect(route.Component).toBe(page.default)
 })
 
 test('pathsToRoutes skips files without default export', () => {
   const pages = {
-    './routes/foo.tsx': { notDefault: () => null }
+    './routes/foo.tsx': { notDefault: () => null } as unknown as Page
   }
   expect(() => pathsToRoutes(pages)).toThrow()
 })
